@@ -22,3 +22,17 @@ Extract them to a folder, for example to /home/centos/mnist or you can copy them
 You can check some enviroment settings with the sql script: 01_check_before_run.sql
 
 If the sample data is visible for the mariadb, than you can create the database itself. The next sql will creates the database objects (tables, views, procedures and functions), uploads the sample data, and transform it into records.: 02_create_environment.sql
+
+
+
+With the next sql you can set the size of layers, and it creates the neurons and the weigths.
+03_create_environment.sql
+
+
+
+If the network is ready, you can initiate the learning with a command:
+
+call learn(number of cycles, learning rate);
+
+for eyxample:
+call learn(100,0.01);
