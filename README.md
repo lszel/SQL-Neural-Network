@@ -1,6 +1,5 @@
 # SQL-Neural-Network
-SQL based Neural Network demo
-
+![Header Image](https://github.com/lszel/SQL-Neural-Network/blob/main/img/header.jpg)
 Handwritted Digit Recognition implemented in pure SQL
 
 
