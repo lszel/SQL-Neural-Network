@@ -6,7 +6,7 @@ Author: László Szél
 
 Date: 2021-02-01
 
-I was created a siple neural network for handwritten digit recognition, and it is implemented in pure SQL. The image transformation from MNIST sample data to database records are implemented in SQL too.
+This is siple neural network for handwritten digit recognition, and it is implemented in pure SQL. The image transformation from MNIST sample data to database records are implemented in SQL too.
 
 The trainig and the test samples are downloadable mnist training and test files from here:
 http://yann.lecun.com/exdb/mnist/
@@ -19,15 +19,25 @@ The files:
 
 Extract them to a folder, for example to /home/centos/mnist or you can copy them into the data directory of the mariadb directly.
 
-You can check some enviroment settings with the sql script: 01_check_before_run.sql
 
-If the sample data is visible for the mariadb, than you can create the database itself. The next sql will creates the database objects (tables, views, procedures and functions), uploads the sample data, and transform it into records.: 02_create_environment.sql
+Check before run
+You can check some enviroment settings with the sql script
 
+Import data and create tables
 
+Extra functions
 
+Main tables
+If the sample data is visible for the mariadb, than you can create the databas
+
+Activation and derivative functions
+
+Computational views
+
+Learning and test procedures
+
+create network
 With the next sql you can set the size of layers, and it creates the neurons and the weigths.
-03_create_environment.sql
-
 
 
 If the network is ready, you can initiate the learning with a command:
