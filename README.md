@@ -32,11 +32,10 @@ You can check some enviroment settings with the sql script
 If the sample data is visible for the mariadb, than you can create the databas
 
 ## Activation and derivative functions
-*RectifiedLinearUnit
-*sigmoid
-*hiperbolictangent
-*and the derivatives
-
+* RectifiedLinearUnit
+* Sigmoid
+* Hiperbolictangent
+* And the derivatives :)
 
 ## Computational views
 *testing is in progress
