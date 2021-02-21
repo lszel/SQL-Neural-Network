@@ -6,7 +6,7 @@ Author: László Szél
 
 Date: 2021-02-01
 
-This is siple neural network for handwritten digit recognition, and it is implemented in pure SQL. The image transformation from MNIST sample data to database records are implemented in SQL too.
+This is a simple neural network for handwritten digit recognition, and it is implemented in pure SQL. The image transformation from MNIST sample data to database records are implemented in SQL too.
 
 The trainig and the test samples are downloadable mnist training and test files from here:
 http://yann.lecun.com/exdb/mnist/
