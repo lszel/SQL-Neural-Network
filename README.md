@@ -32,14 +32,19 @@ You can check some enviroment settings with the sql script
 If the sample data is visible for the mariadb, than you can create the databas
 
 ## Activation and derivative functions
-
+*RectifiedLinearUnit
+*sigmoid
+*hiperbolictangent
+*and the derivatives
 
 
 ## Computational views
-*testing is in progress, available soon*
+*testing is in progress
+available soon*
 
 ## Learning and test procedures
-*testing is in progress, available soon*
+*testing is in progress
+available soon*
 
 ## create network
 With the next sql you can set the size of layers, and it creates the neurons and the weigths.
