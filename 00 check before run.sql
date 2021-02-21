@@ -1,7 +1,7 @@
 #  checking setup
 
 #  before start the script!!!!
-#  modify the ownership of the downloaded files for mysql user to be able to load 
+#  modify the ownership of the downloadad files for mysql user to be able to load 
 # for example:
 #  chown -R mysql:mysql /home/centos/mnist/
 # and set the initial parameters:

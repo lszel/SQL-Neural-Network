@@ -19,3 +19,21 @@ WHERE
 ORDER BY numbers_table.num;
 END$$
 DELIMITER ;   
+
+
+DROP function IF EXISTS `asciiart`;
+DELIMITER $$
+USE `mnist`$$
+CREATE DEFINER=`student`@`%` FUNCTION `asciiart`(s varchar(255)) RETURNS varchar(255) CHARSET latin1
+BEGIN
+set @i =0;
+set @y='';
+while @i < length(s)  do    
+    set @x=ascii( substr(s,@i,1)  );
+    set @y = concat( @y, substr(" .:-=+*#%@",round(@x*10/255+1),1) );    
+    set @i=@i+1;
+end while;
+   
+RETURN @y; 
+END$$
+DELIMITER ;

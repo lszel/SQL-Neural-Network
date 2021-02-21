@@ -19,6 +19,8 @@ SET GLOBAL max_allowed_packet=1073741824;
 #flush privileges;
 
 SET SESSION storage_engine = MyISAM;
+set global innodb_file_per_table=1;
+SET sql_mode = '';
 
 #  creation of mnist database
 DROP DATABASE IF EXISTS mnist;
@@ -26,7 +28,7 @@ CREATE SCHEMA `mnist` ;
  
 USE mnist;
 
-#  tricky table, it is a view of numbers from 0 to 9999999
+#  tricky view of numbers from 0 to 9999999
 CREATE VIEW `numbers` AS
     SELECT 
         x1.N + x10.N * 10 + x100.N * 100 + x1000.N * 1000 + x10000.N * 10000 + x100000.N * 100000 + x1000000.N * 1000000 AS num
@@ -43,10 +45,8 @@ CREATE VIEW `numbers` AS
 #  numbers table, it is a faster than using the view      
 DROP TABLE IF EXISTS `numbers_table`;
 create table `numbers_table` as
-select 
-  *
-from
-  numbers;  
+select *
+from  numbers;  
 ALTER TABLE `numbers_table` 
 ADD PRIMARY KEY (`num`);  
     
@@ -88,7 +88,7 @@ where
     
 ALTER TABLE `test_images` 
 ADD PRIMARY KEY (`id`),
-ADD UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE;    
+ADD UNIQUE INDEX `id_UNIQUE` (`id` ASC);    
     
 # convert test labels data  into a table:
 set @source='test_labels';
@@ -125,7 +125,7 @@ where
     
 ALTER TABLE `mnist`.`train_images` 
 ADD PRIMARY KEY (`id`),
-ADD UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE;
+ADD UNIQUE INDEX `id_UNIQUE` (`id` ASC);
     
     
 # convert train labels data  into a table:
@@ -150,142 +150,14 @@ ADD PRIMARY KEY (`id`);
 # data loader table no longer required
 drop table mnist_data_loader;
 
-    
-    
-# Create the 'working' part of the database
-    
-    
- # create neurons table   
- CREATE TABLE `neurons` (
-  `n_id` int(11) NOT NULL,
-  `layer_id` int(11) DEFAULT NULL,
-  `bias` float DEFAULT 0,
-  `predicted` float DEFAULT 0,
-  `expected` float DEFAULT 0,
-  `error_derivative` float DEFAULT 0,
-  PRIMARY KEY (`n_id`),
-  KEY `layer` (`layer_id`)
-) ;
-
-create view neuron_delta as 
-select 
-   *,
-   (n.expected-n.predicted)*(n.predicted*(1-n.predicted)) delta
-from 
-    neurons n;
-
-# create weights table 
-CREATE TABLE `weights` (
-  `w_id` int(11) NOT NULL,
-  `n_id_in` int(11) DEFAULT NULL,
-  `n_id_out` int(11) DEFAULT NULL,
-  `w` float DEFAULT 0,
-  `delta` float DEFAULT 0,
-  PRIMARY KEY (`w_id`),
-  KEY `n_id_in` (`n_id_in`),
-  KEY `n_id_out` (`n_id_out`)
-) ;  
-
-
-DROP function IF EXISTS `sigmoid`;
-DELIMITER $$
-CREATE FUNCTION `sigmoid` (x float)
-RETURNS float
-BEGIN
-   RETURN 1 / (1 + EXP(-x));
-END$$
-DELIMITER ;
-
-
-DROP function IF EXISTS `sigmoid_derivative`;
-DELIMITER $$
-CREATE FUNCTION `sigmoid_derivative` (x float)
-RETURNS float
-BEGIN
-   set @S=exp(x);
-   RETURN @s / pow(1+@s,2);
-END$$
-DELIMITER ;
-
-
-DROP function IF EXISTS `hiperbolictangent`;
-DELIMITER $$
-USE `mnist`$$
-CREATE FUNCTION `hiperbolictangent` (x float) RETURNS float
-BEGIN
-  set @exp2x :=   exp(-2 * x);
-RETURN (1 - @exp2x) / (1 + @exp2x);
-END;$$
-DELIMITER ;
-
-
-DROP function IF EXISTS `hiperbolictangent_derivative`;
-DELIMITER $$
-USE `mnist`$$
-CREATE FUNCTION `hiperbolictangent_derivative` (x float) RETURNS float
-BEGIN
-RETURN  1 - pow(HiperbolicTangent(x),2);
-END$$
-DELIMITER ;
-
-
-CREATE VIEW `neuron_error_derivative` AS
-select
-   n.n_id,
-  sum(ne.error_derivative*w.w) * sigmoid_derivative(n.predicted) error_derivative
- from
-  neurons n
-  join weights w on w.n_id_in = n.n_id
-  join neurons ne on ne.n_id=w.n_id_out
-group by n.n_id;  
-
-
-CREATE VIEW forward_propagation_values AS
-    SELECT 
-        n.n_id AS n_id,
-        n.predicted,
-         SIGMOID(SUM(ni.predicted * w.w) + n.bias) AS `calculated_output`
-    #    hiperbolictangent(SUM(ni.predicted * w.w) + n.bias) AS `calculated_output`
-    FROM
-        weights w
-        JOIN neurons n  on n.n_id = w.n_id_out
-        JOIN neurons ni on ni.n_id = w.n_id_in
-    GROUP BY n.n_id;
-    
-    
-    
-CREATE 
-VIEW back_propagation_values AS
- SELECT    
-   n.n_id,
-   sum(w.w*nd.delta) delta
-FROM
-    neurons n
-    join weights w on w.n_id_in=n.n_id
-    join neuron_delta nd on nd.n_id=w.n_id_out
-group by n.n_id;
-
-
-create view bias_propagation_values as
-SELECT    
-   n.n_id,
-   sum(nd.delta) delta
-FROM
-    neurons n
-    join weights w on w.n_id_in=n.n_id
-    join neuron_delta nd on nd.n_id=w.n_id_out
-group by n.n_id;
-
-
-
-
 
 # create view for train data ( split info to pixel by pixel related to image ID, and info about which input neuron will be affected)
 CREATE OR REPLACE VIEW `train_matrix` AS
     SELECT 
         train_images.id AS image_id,
         num AS n_id,
-        ASCII(SUBSTR(train_images.image, num, 1)) AS input
+            (ASCII(SUBSTR(train_images.image, num, 1)))/256 AS input
+        #   (ASCII(SUBSTR(train_images.image, num, 1))) AS input
     FROM
         numbers_table,
         `train_images`
@@ -295,15 +167,14 @@ CREATE OR REPLACE VIEW `train_matrix` AS
 CREATE OR REPLACE VIEW test_matrix AS
     SELECT 
         test_images.id AS image_id,
-        numbers_table.num AS n_id,
-        ASCII(SUBSTR(test_images.image,
-                numbers_table.num,
-                1)) AS `input`
+        n.num AS n_id,
+      (ASCII(SUBSTR(test_images.image,n.num,1)))/256 AS `input`
+       #   (ASCII(SUBSTR(test_images.image,n.num,1))) AS `input`
     FROM
-        (numbers_table
+        (numbers_table n
         JOIN test_images)
     WHERE
-        numbers_table.num <= 784;        
+        n.num <= 784;        
    
 # create view for train results ( put the label value into a proper row (value 1 the not proper rowa are 0 )
 CREATE OR REPLACE VIEW `result_matrix` AS
@@ -342,93 +213,3 @@ CREATE OR REPLACE VIEW test_result_matrix AS
     WHERE
         numbers_table.num < 10
     ORDER BY test_labels.id , numbers_table.num;   
-
-
-# Create the 'working' part of the database
-
-
-DROP procedure IF EXISTS `propagate`;
-DROP procedure IF EXISTS `learn`;
-
-DELIMITER $$
-CREATE PROCEDURE `propagate`(IN input_image integer, IN alpha float)
-BEGIN
-
-SET SQL_SAFE_UPDATES = 0;
-   
-# set the input values to the predicted 'port' of the input neurons 
-UPDATE neurons
-JOIN  train_matrix ON neurons.n_id = train_matrix.n_id 
-SET  neurons.predicted = train_matrix.input
-WHERE  train_matrix.image_id = input_image;
-
-# set the result values to the expected 'port' of the output neurons 
-update neurons n
-join result_matrix r on n.n_id=r.n_id
-set n.expected=r.output
-where image_id= input_image;
-
-#  forward propagation
-
-# calculate layer 1
-update neurons n
-JOIN forward_propagation_values fpv on n.n_id=fpv.n_id
-set n.predicted=fpv.calculated_output
-where n.layer_id=1;
-
-# calculate layer 2
-update neurons n
-JOIN forward_propagation_values fpv on n.n_id=fpv.n_id
-set n.predicted=fpv.calculated_output
-where n.layer_id=2;
-
-# calculate layer 3
-update neurons n
-JOIN forward_propagation_values fpv on n.n_id=fpv.n_id
-set n.predicted=fpv.calculated_output
-where n.layer_id=3;
-
-# calculate layer 3 error derivative
-update neurons n
- set n.error_derivative= (n.predicted - n.expected) * sigmoid_derivative(  n.predicted  )
-# set n.error_derivative= abs(n.predicted - n.expected) * hiperbolictangent_derivative(  n.predicted  )
-where n.layer_id=3;
-
-# back propagation 
-
-update neurons n
-  join neuron_error_derivative ned on ned.n_id = n.n_id
-  set n.error_derivative = ned.error_derivative
-where n.layer_id=2;
-
-update neurons n
-  join neuron_error_derivative ned on ned.n_id = n.n_id
-  set n.error_derivative = ned.error_derivative
-where n.layer_id=1;
-
-update neurons n
-set n.bias = n.bias - alpha * n.error_derivative;
-
-
-update weights w
-join neurons n on n.n_id=w.n_id_out
-set w.w = w - alpha * n.error_derivative;
-   
-END$$
-
-
-
-DELIMITER $$
-CREATE PROCEDURE `learn`(in max integer, in alpha float)
-BEGIN 
-   DECLARE a INT Default 0 ;
-      
-   simple_loop: LOOP
-      SET a=a+1;
-    
-        call propagate(round(rand()*60000),alpha);
-         IF a=max THEN
-            LEAVE simple_loop;
-         END IF;
-   END LOOP simple_loop;
-END$$
