@@ -20,24 +20,28 @@ The files:
 Extract them to a folder, for example to /home/centos/mnist or you can copy them into the data directory of the mariadb directly.
 
 
-#Check before run
+## Check before run
 You can check some enviroment settings with the sql script
 
-#Import data and create tables
+## Import data and create tables
 
-#Extra functions
+## Extra functions
 ![Show_image_function](https://github.com/lszel/SQL-Neural-Network/blob/main/img/show_image.jpg)
 
-#Main tables
+## Main tables
 If the sample data is visible for the mariadb, than you can create the databas
 
-#Activation and derivative functions
+## Activation and derivative functions
 
-#Computational views
 
-#Learning and test procedures
 
-#create network
+## Computational views
+*testing is in progress, available soon*
+
+## Learning and test procedures
+*testing is in progress, available soon*
+
+## create network
 With the next sql you can set the size of layers, and it creates the neurons and the weigths.
 
 
