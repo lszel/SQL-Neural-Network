@@ -24,6 +24,7 @@ Extract them to a folder, for example to /home/centos/mnist or you can copy them
 You can check some enviroment settings with the sql script
 
 ## Import data and create tables
+This sql file loads the original mnist files into a table and split them to separate rows for faster use.
 
 ## Extra functions
 ![Show_image_function](https://github.com/lszel/SQL-Neural-Network/blob/main/img/show_image.jpg)
