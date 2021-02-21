@@ -148,6 +148,7 @@ ADD PRIMARY KEY (`id`);
 
 
 # data loader table no longer required
+# If you would like tu see an image with the show image function than comment it out ;)
 drop table mnist_data_loader;
 
 
