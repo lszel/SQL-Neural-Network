@@ -1,4 +1,4 @@
-# Handwritted Digit Recognition implemented in pure SQL
+# Handwritten Digit Recognition implemented in pure SQL
 ![Header Image](https://github.com/lszel/SQL-Neural-Network/blob/main/img/header.jpg)
 
 
