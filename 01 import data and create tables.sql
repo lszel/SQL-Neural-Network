@@ -175,42 +175,4 @@ CREATE OR REPLACE VIEW test_matrix AS
         (numbers_table n
         JOIN test_images)
     WHERE
-        n.num <= 784;        
-   
-# create view for train results ( put the label value into a proper row (value 1 the not proper rowa are 0 )
-CREATE OR REPLACE VIEW `result_matrix` AS
-    SELECT 
-        num+(select min(n_id) from neurons where layer_id=(select max(layer_id) from neurons)) as n_id,
-        id AS image_id,
-        num AS result_id,
-        IF(num = label, 1, 0) AS output
-    FROM
-        numbers_table,
-        train_labels
-    WHERE
-        num < 10
-    ORDER BY image_id , num;
-    
-    
-CREATE OR REPLACE VIEW test_result_matrix AS
-    SELECT 
-        numbers_table.num + (SELECT 
-                MIN(neurons.n_id)
-            FROM
-                neurons
-            WHERE
-                neurons.layer_id = (SELECT 
-                        MAX(neurons.layer_id)
-                    FROM
-                        neurons)) AS n_id,
-        test_labels.id AS image_id,
-        numbers_table.num AS result_id,
-        IF(numbers_table.num = test_labels.label,
-            1,
-            0) AS `output`
-    FROM
-        (numbers_table
-        JOIN test_labels)
-    WHERE
-        numbers_table.num < 10
-    ORDER BY test_labels.id , numbers_table.num;   
+        n.num <= 784; 

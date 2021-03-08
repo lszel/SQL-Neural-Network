@@ -4,8 +4,8 @@ SET SQL_SAFE_UPDATES = 0;
 set @input_neurons_count=784;  #28*28
 set @output_neurons_count=10;
 set @hidden_layers_count=2;
-set @hidden_layer1_size=50;
-set @hidden_layer2_size=50;
+set @hidden_layer1_size=300;
+set @hidden_layer2_size=300;
 
 
 truncate test_accuracy_log;
@@ -13,7 +13,7 @@ truncate train_accuracy_log;
 truncate `neurons`;
 
 # create input neurons
-set @last_id=784;
+set @last_id=@input_neurons_count;
 insert into `neurons` ( `n_id`, `layer_id`,  `bias`)
 select
   id.num as n_id,
@@ -27,8 +27,8 @@ insert into `neurons` ( `n_id`, `layer_id`,  `bias`)
 select
   id.num as n_id,
   1 as layer_id,
-  # (rand()*2-1)/@hidden_layer1_size as bias
-  0 as bias
+   (rand()*2-1)/@hidden_layer1_size as bias
+  -- as bias
   #rand()*2-1 as bias
 from
    (select num from numbers_table where num>@last_id and num<=@last_id+@hidden_layer1_size)  id;
@@ -39,8 +39,8 @@ insert into `neurons` ( `n_id`, `layer_id`,  `bias`)
 select
   id.num as n_id,
   2 as layer_id,
-  # (rand()*2-1)/@hidden_layer2_size as bias
-  0 as bias
+   (rand()*2-1)/@hidden_layer2_size as bias
+  -- as bias
   #rand()*2-1 as bias
 from
    (select num from numbers_table where num>@last_id and num<=@last_id+@hidden_layer2_size)  id;
@@ -64,8 +64,8 @@ SELECT
  (@row_number:=@row_number + 1) AS w_id, 
   n_in.n_id,
   n_out.n_id,
-  (rand()*2-1) w  #because of the input values 0-255 
-# 0 as w
+  (rand()*2-1) w  
+
 from
   neurons n_in,
   neurons n_out

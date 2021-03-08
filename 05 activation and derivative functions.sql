@@ -28,6 +28,17 @@ BEGIN
 END$$
 DELIMITER ;
 
+drop function if exists LeakyRectifiedLinearUnit;
+DELIMITER $$
+CREATE FUNCTION LeakyRectifiedLinearUnit (x float)
+RETURNS float
+BEGIN
+   RETURN if(x>0,x,0.1*x);
+END$$
+DELIMITER ;
+
+
+
 DROP function IF EXISTS `sigmoid`;
 DELIMITER $$
 CREATE FUNCTION `sigmoid` (x float)
@@ -43,8 +54,7 @@ DELIMITER $$
 CREATE FUNCTION `sigmoid_derivative` (x float)
 RETURNS float
 BEGIN   
-   set @S=exp(clip(x));
-   RETURN @s / pow(1+@s,2);
+  RETURN x * (1 -x);
 END$$
 DELIMITER ;
 
@@ -66,5 +76,15 @@ USE `mnist`$$
 CREATE FUNCTION `hiperbolictangent_derivative` (x float) RETURNS float
 BEGIN
 RETURN  1 - pow(HiperbolicTangent(x),2);
+END$$
+DELIMITER ;
+
+
+DROP function IF EXISTS `squared_error`;
+DELIMITER $$
+USE `mnist`$$
+CREATE FUNCTION `squared_error` (x float) RETURNS float
+BEGIN
+RETURN ( SELECT  sum(pow(expected-predicted,2)/2) squared_error FROM  neurons  WHERE  layer_id = x );
 END$$
 DELIMITER ;
