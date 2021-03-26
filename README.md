@@ -39,12 +39,10 @@ If the sample data is visible for the mariadb, than you can create the databas
 * And the derivatives :)
 
 ## Computational views
-*testing is in progress
-available soon*
+These views are contains the base calculations for learning and backpropagation. 
 
 ## Learning and test procedures
-*testing is in progress
-available soon*
+Main procedures and functions for learning and testing. 
 
 ## create network
 With the next sql you can set the size of layers, and it creates the neurons and the weigths.
