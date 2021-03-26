@@ -50,7 +50,7 @@ With the next sql you can set the size of layers, and it creates the neurons and
 
 If the network is ready, you can initiate the learning with a command:
 
-call learn(number of cycles, learning rate);
+call train(number of cycles, the batch size, learning rate);
 
 for eyxample:
-call learn(100,0.01);
+call trina(20,100,0.01);
