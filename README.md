@@ -53,4 +53,4 @@ If the network is ready, you can initiate the learning with a command:
 call train(number of cycles, the batch size, learning rate);
 
 for eyxample:
-call trina(20,100,0.01);
+call train(20,100,0.01);
